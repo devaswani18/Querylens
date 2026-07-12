@@ -151,12 +151,14 @@ Response: `{ success: true }` → frontend then re-runs the original query via `
 
 ## Environment Variables
 ```
-DATABASE_URL=              # local Postgres in dev, Neon connection string in prod
+DATABASE_URL=                  # superuser/admin connection, used only for setup scripts (schema/seed), not by the running app
+DATABASE_URL_READONLY=         # used by /query/execute and /explain — SELECT-only role
+DATABASE_URL_INDEX_MANAGER=    # used only by /apply-index — CREATE-only role, no SELECT/INSERT/UPDATE/DELETE
 GEMINI_API_KEY=
 PORT=
 NODE_ENV=
 ```
-Switching between local and Neon is a `.env` change only — no code touches connection logic outside `config/db.ts`.
+`config/db.ts` exposes two separate connection pools (readonly and index-manager), selected per-route based on which DB role that feature is allowed to use — never a single shared pool with full privileges. Switching between local and Neon is a `.env` value change only — no code touches connection logic outside `config/db.ts`.
 
 ## Error Handling Convention
 All routes throw to a central `errorHandler` middleware. Errors return: `{ error: { message: string, code: string } }`. No raw stack traces or SQL error internals returned to the client.
