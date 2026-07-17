@@ -149,6 +149,9 @@ Response: `{ success: true }` → frontend then re-runs the original query via `
 - `querylens_readonly` — used by `/query/execute` and `/explain`. SELECT only.
 - `querylens_index_manager` — used only by `/apply-index`. CREATE INDEX only, nothing else.
 
+## Note on Gemini Model Names
+Gemini model availability changes frequently — during this project's build, `gemini-2.5-flash` returned a 404 (deprecated for new API keys) and was replaced with `gemini-3.1-flash-lite`. If `config/gemini.ts` starts returning 404 errors in the future, check https://ai.google.dev/gemini-api/docs/changelog for the current recommended lightweight/fast model and update the model string there — this is the only place it's referenced.
+
 ## Environment Variables
 ```
 DATABASE_URL=                  # superuser/admin connection, used only for setup scripts (schema/seed), not by the running app

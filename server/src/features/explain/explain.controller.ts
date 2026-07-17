@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { runExplain } from './explain.service';
 import { analyzePlan } from './ruleEngine';
+import { explainFindings } from './explanation.service';
 
 /**
  * POST /api/explain
@@ -13,7 +14,7 @@ import { analyzePlan } from './ruleEngine';
  *   data: {
  *     rawPlan:     { ... },   // full EXPLAIN ANALYZE JSON tree
  *     findings:    { issues: [...], suggestedIndexes: [...] },
- *     explanation: null        // filled in by the Gemini layer in the next step
+ *     explanation: string | null  // plain-English from Gemini, or null if unavailable
  *   }
  * }
  */
@@ -38,13 +39,14 @@ export async function explainController(
 
     const rawPlan = await runExplain(sql);
     const findings = analyzePlan(rawPlan);
+    const explanation = await explainFindings(findings);
 
     res.status(200).json({
       success: true,
       data: {
         rawPlan,
         findings,
-        explanation: null,
+        explanation,
       },
     });
   } catch (err) {
