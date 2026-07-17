@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import config from './config/env';
 import queryRoutes from './features/query/query.routes';
+import schemaRoutes from './features/schema/schema.routes';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
@@ -31,8 +32,9 @@ app.use(express.json());
 // Routes
 // ---------------------------------------------------------------------------
 app.use('/api/query', queryRoutes);
+app.use('/api/schema', schemaRoutes);
 
-// (schema, explain, nlToSql, applyIndex routes will be mounted here in later steps)
+// (explain, nlToSql, applyIndex routes will be mounted here in later steps)
 
 // ---------------------------------------------------------------------------
 // Central error handler — MUST be last
