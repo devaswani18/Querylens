@@ -57,6 +57,9 @@ export default function Workspace() {
   const [isApplying, setIsApplying] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
 
+  // ── Ask AI (nl-to-sql) ─────────────────────────────────────────────────────
+  const [isAskingAi, setIsAskingAi] = useState(false);
+
   // ── Handlers ───────────────────────────────────────────────────────────────
 
   async function handleRun() {
@@ -125,6 +128,18 @@ export default function Workspace() {
     setApplyError(null);
   }
 
+  async function handleAskAi(prompt: string): Promise<string> {
+    setIsAskingAi(true);
+    try {
+      const res = await client.post('/api/nl-to-sql', { prompt });
+      return res.data.data.sql;
+    } catch (err: unknown) {
+      throw new Error(extractErrorMessage(err, 'AI SQL generation failed.'));
+    } finally {
+      setIsAskingAi(false);
+    }
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
@@ -156,6 +171,8 @@ export default function Workspace() {
               onChange={setSql}
               onRun={handleRun}
               isRunning={isRunning}
+              onAskAi={handleAskAi}
+              isAskingAi={isAskingAi}
             />
 
             {/* Explain button — separate from SqlEditor's Run */}
