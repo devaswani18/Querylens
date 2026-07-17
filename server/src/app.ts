@@ -4,6 +4,7 @@ import cors from 'cors';
 import config from './config/env';
 import queryRoutes from './features/query/query.routes';
 import schemaRoutes from './features/schema/schema.routes';
+import explainRoutes from './features/explain/explain.routes';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
@@ -33,8 +34,9 @@ app.use(express.json());
 // ---------------------------------------------------------------------------
 app.use('/api/query', queryRoutes);
 app.use('/api/schema', schemaRoutes);
+app.use('/api/explain', explainRoutes);
 
-// (explain, nlToSql, applyIndex routes will be mounted here in later steps)
+// (nlToSql, applyIndex routes will be mounted here in later steps)
 
 // ---------------------------------------------------------------------------
 // Central error handler — MUST be last
