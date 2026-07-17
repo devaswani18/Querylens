@@ -17,10 +17,12 @@ function optionalEnv(name: string, fallback: string): string {
   return process.env[name] ?? fallback;
 }
 
-// DATABASE_URL is intentionally optional at runtime — it is for setup scripts only (schema.sql / seed.sql).
-// The app itself ONLY uses the two scoped connection strings below.
+// All three DATABASE_URL variants are required at runtime:
+// DATABASE_URL             — superuser connection, used by adminPool for CREATE INDEX execution
+// DATABASE_URL_READONLY    — read-only role, used by /api/query/execute and /api/explain
+// DATABASE_URL_INDEX_MANAGER — retained for potential future use
 const config = {
-  databaseUrl: process.env['DATABASE_URL'] ?? '', // setup scripts only — not used by the running app
+  databaseUrl: requireEnv('DATABASE_URL'),
   databaseUrlReadonly: requireEnv('DATABASE_URL_READONLY'),
   databaseUrlIndexManager: requireEnv('DATABASE_URL_INDEX_MANAGER'),
   geminiApiKey: requireEnv('GEMINI_API_KEY'),

@@ -6,6 +6,7 @@ import queryRoutes from './features/query/query.routes';
 import schemaRoutes from './features/schema/schema.routes';
 import explainRoutes from './features/explain/explain.routes';
 import nlToSqlRoutes from './features/nlToSql/nlToSql.routes';
+import applyIndexRoutes from './features/applyIndex/applyIndex.routes';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
@@ -37,8 +38,7 @@ app.use('/api/query', queryRoutes);
 app.use('/api/schema', schemaRoutes);
 app.use('/api/explain', explainRoutes);
 app.use('/api/nl-to-sql', nlToSqlRoutes);
-
-// (applyIndex routes will be mounted here in the next step)
+app.use('/api/apply-index', applyIndexRoutes);
 
 // ---------------------------------------------------------------------------
 // Central error handler — MUST be last
