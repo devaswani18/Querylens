@@ -4,6 +4,7 @@ import SqlEditor from '../components/SqlEditor';
 import ResultsTable from '../components/ResultsTable';
 import PlanViewer from '../components/PlanViewer';
 import ApplyIndexModal from '../components/ApplyIndexModal';
+import ComparisonCard from '../components/ComparisonCard';
 import client from '../api/client';
 
 // ---------------------------------------------------------------------------
@@ -60,12 +61,20 @@ export default function Workspace() {
   // ── Ask AI (nl-to-sql) ─────────────────────────────────────────────────────
   const [isAskingAi, setIsAskingAi] = useState(false);
 
+  // ── Before/After comparison ──────────────────────────────────────────────
+  const [comparison, setComparison] = useState<{
+    beforeMs: number;
+    afterMs: number;
+    percentFaster: number;
+  } | null>(null);
+
   // ── Handlers ───────────────────────────────────────────────────────────────
 
-  async function handleRun() {
+  async function handleRun(): Promise<number | null> {
     setIsRunning(true);
     setQueryError(null);
     setActiveTab('results');
+    setComparison(null);
     try {
       const res = await client.post('/api/query/execute', { sql });
       const data = res.data.data;
@@ -73,9 +82,11 @@ export default function Workspace() {
       setRowCount(data.rowCount);
       setExecutionTimeMs(data.executionTimeMs);
       setTruncated(data.truncated);
+      return data.executionTimeMs;
     } catch (err: unknown) {
       setQueryError(extractErrorMessage(err, 'Query failed.'));
       setRows(null);
+      return null;
     } finally {
       setIsRunning(false);
     }
@@ -111,11 +122,24 @@ export default function Workspace() {
     setIsApplying(true);
     setApplyError(null);
     try {
+      // Capture the "before" timing from current state, before anything changes.
+      const beforeMs = executionTimeMs;
+
       await client.post('/api/apply-index', { statement: pendingStatement });
       setPendingStatement(null);
-      // Switch to Results tab and re-run to show the before/after improvement
       setActiveTab('results');
-      await handleRun();
+
+      // handleRun returns the fresh timing directly — reading it from the
+      // return value (not a state read right after) avoids React's async
+      // state update timing, which could otherwise show a stale "before" value.
+      const afterMs = await handleRun();
+
+      if (beforeMs !== null && afterMs !== null && beforeMs > 0) {
+        const percentFaster = ((beforeMs - afterMs) / beforeMs) * 100;
+        setComparison({ beforeMs, afterMs, percentFaster });
+      } else {
+        setComparison(null);
+      }
     } catch (err: unknown) {
       setApplyError(extractErrorMessage(err, 'Failed to apply index.'));
     } finally {
@@ -223,13 +247,22 @@ export default function Workspace() {
           {/* Tab content */}
           <div className="flex-1 overflow-y-auto p-4">
             {activeTab === 'results' && (
-              <ResultsTable
-                rows={rows}
-                rowCount={rowCount}
-                executionTimeMs={executionTimeMs}
-                truncated={truncated}
-                error={queryError}
-              />
+              <div className="flex flex-col gap-4">
+                {comparison && (
+                  <ComparisonCard
+                    beforeMs={comparison.beforeMs}
+                    afterMs={comparison.afterMs}
+                    percentFaster={comparison.percentFaster}
+                  />
+                )}
+                <ResultsTable
+                  rows={rows}
+                  rowCount={rowCount}
+                  executionTimeMs={executionTimeMs}
+                  truncated={truncated}
+                  error={queryError}
+                />
+              </div>
             )}
             {activeTab === 'plan' && (
               <PlanViewer
