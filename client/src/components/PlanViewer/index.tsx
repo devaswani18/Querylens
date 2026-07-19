@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PlanTree from './PlanTree';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -62,7 +63,7 @@ function issueIcon(type: string): string {
 
 function InlineError({ message }: { message: string }) {
   return (
-    <div className="rounded border border-red-800 bg-red-950 px-3 py-2 text-sm text-red-300">
+    <div className="rounded border border-alert/40 bg-alert/10 px-3 py-2 text-sm text-alert">
       {message}
     </div>
   );
@@ -73,20 +74,20 @@ function IssueCard({ issue }: { issue: Issue }) {
   const icon = issueIcon(issue.type);
 
   return (
-    <div className="rounded border border-amber-800/50 bg-amber-950/40 px-4 py-3">
+    <div className="rounded border border-alert/40 bg-alert/10 px-4 py-3">
       <div className="mb-1.5 flex items-center gap-2">
         <span className="text-base leading-none">{icon}</span>
-        <span className="text-sm font-semibold text-amber-300">{label}</span>
+        <span className="text-sm font-semibold text-alert">{label}</span>
         {issue.table && (
-          <span className="font-mono text-xs text-slate-400">
+          <span className="font-mono text-xs text-fog">
             on &quot;{issue.table}&quot;
           </span>
         )}
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-400">
+      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-fog">
         {issue.rows !== undefined && (
           <span>
-            <span className="font-semibold text-slate-200">
+            <span className="font-mono font-semibold text-slate-100">
               {issue.rows.toLocaleString()}
             </span>{' '}
             rows scanned
@@ -94,7 +95,7 @@ function IssueCard({ issue }: { issue: Issue }) {
         )}
         {issue.actualTimeMs !== undefined && (
           <span>
-            <span className="font-semibold text-slate-200">
+            <span className="font-mono font-semibold text-slate-100">
               {issue.actualTimeMs.toFixed(2)}ms
             </span>{' '}
             actual time
@@ -103,7 +104,7 @@ function IssueCard({ issue }: { issue: Issue }) {
         {issue.costEstimate !== undefined && (
           <span>
             cost estimate{' '}
-            <span className="font-semibold text-slate-200">
+            <span className="font-mono font-semibold text-slate-100">
               {issue.costEstimate.toFixed(1)}
             </span>
           </span>
@@ -121,19 +122,19 @@ function IndexSuggestion({
   onApply: (statement: string) => void;
 }) {
   return (
-    <div className="rounded border border-slate-700 bg-slate-800/60 px-4 py-3">
-      <div className="mb-2 text-xs text-slate-400">
+    <div className="rounded border border-steel bg-ink px-4 py-3">
+      <div className="mb-2 text-xs text-fog">
         Suggested index on{' '}
-        <span className="font-mono text-slate-200">
+        <span className="font-mono text-slate-100">
           {idx.table}.{idx.column}
         </span>
       </div>
-      <pre className="mb-3 overflow-x-auto rounded bg-slate-900 px-3 py-2 font-mono text-xs text-emerald-300">
+      <pre className="mb-3 overflow-x-auto rounded bg-void px-3 py-2 font-mono text-xs text-pulse">
         {idx.statement}
       </pre>
       <button
         onClick={() => onApply(idx.statement)}
-        className="rounded bg-emerald-700 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-600 active:bg-emerald-800"
+        className="rounded bg-signal px-3 py-1.5 text-xs font-medium text-void transition-opacity hover:opacity-90 active:opacity-80"
       >
         Apply Suggested Index
       </button>
@@ -145,10 +146,10 @@ function RawPlanToggle({ rawPlan }: { rawPlan: object }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded border border-slate-700">
+    <div className="rounded border border-steel">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between px-4 py-2.5 text-xs text-slate-400 hover:bg-slate-800 transition-colors"
+        className="flex w-full items-center justify-between px-4 py-2.5 text-xs text-fog hover:bg-steel/50 transition-colors"
       >
         <span className="font-medium">View Raw Execution Plan</span>
         <span
@@ -158,7 +159,7 @@ function RawPlanToggle({ rawPlan }: { rawPlan: object }) {
         </span>
       </button>
       {open && (
-        <pre className="max-h-96 overflow-auto border-t border-slate-700 bg-slate-900 px-4 py-3 font-mono text-[11px] text-slate-300">
+        <pre className="max-h-96 overflow-auto border-t border-steel bg-void px-4 py-3 font-mono text-[11px] text-fog">
           {JSON.stringify(rawPlan, null, 2)}
         </pre>
       )}
@@ -181,8 +182,8 @@ export default function PlanViewer({
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 py-8 text-sm text-slate-500">
-        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-transparent" />
+      <div className="flex items-center gap-2 py-8 text-sm text-fog">
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-fog border-t-transparent" />
         Analyzing query plan…
       </div>
     );
@@ -196,7 +197,7 @@ export default function PlanViewer({
   // ── Empty / idle ─────────────────────────────────────────────────────────
   if (!findings) {
     return (
-      <div className="flex items-center justify-center py-12 text-sm text-slate-600 italic">
+      <div className="flex items-center justify-center py-12 text-sm text-fog/60 italic">
         Run &ldquo;Explain Query&rdquo; to analyze performance
       </div>
     );
@@ -210,22 +211,32 @@ export default function PlanViewer({
     <div className="flex flex-col gap-4">
       {/* ── Explanation callout ── */}
       {explanation !== null ? (
-        <div className="rounded border border-indigo-700/60 bg-indigo-950/50 px-4 py-3">
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-indigo-400">
+        <div className="rounded border border-signal/40 bg-signal/10 px-4 py-3">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-signal">
             AI Explanation
           </p>
-          <p className="text-sm leading-relaxed text-slate-200">{explanation}</p>
+          <p className="text-sm leading-relaxed text-slate-100">{explanation}</p>
         </div>
       ) : (
-        <p className="text-xs text-slate-600 italic">
+        <p className="text-xs text-fog/60 italic">
           AI explanation unavailable, showing raw findings
         </p>
+      )}
+
+      {/* ── Plan tree ── */}
+      {rawPlan && (rawPlan as Record<string, unknown>)['Plan'] && (
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-fog">
+            Execution Plan Tree
+          </p>
+          <PlanTree plan={(rawPlan as Record<string, unknown>)['Plan'] as object} />
+        </div>
       )}
 
       {/* ── Issues ── */}
       {hasIssues && (
         <div className="flex flex-col gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-fog">
             Issues found
           </p>
           {findings.issues.map((issue, i) => (
@@ -235,7 +246,7 @@ export default function PlanViewer({
       )}
 
       {!hasIssues && (
-        <p className="text-sm text-emerald-500">
+        <p className="text-sm text-pulse">
           ✓ No performance issues detected.
         </p>
       )}
@@ -243,7 +254,7 @@ export default function PlanViewer({
       {/* ── Suggested indexes ── */}
       {hasIndexes && (
         <div className="flex flex-col gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-fog">
             Suggested indexes
           </p>
           {findings.suggestedIndexes.map((idx, i) => (

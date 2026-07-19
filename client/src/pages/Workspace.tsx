@@ -167,13 +167,20 @@ export default function Workspace() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-slate-950 text-slate-200">
+    <div className="flex h-screen flex-col overflow-hidden bg-void font-sans text-slate-200">
 
       {/* ── Header ── */}
-      <header className="flex h-12 shrink-0 items-center border-b border-slate-800 bg-slate-900 px-5">
-        <span className="text-base font-semibold tracking-tight text-slate-100">
+      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-steel bg-ink px-5">
+        {/* Product wordmark */}
+        <span className="font-mono text-base font-semibold tracking-tight text-slate-100">
           QueryLens{' '}
-          <span className="font-normal text-indigo-400">AI</span>
+          <span className="font-bold text-signal">AI</span>
+        </span>
+
+        {/* Live connection indicator — purely visual */}
+        <span className="flex items-center gap-1.5 text-[10px] text-fog">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-pulse" />
+          connected
         </span>
       </header>
 
@@ -181,7 +188,7 @@ export default function Workspace() {
       <div className="flex flex-1 overflow-hidden">
 
         {/* Sidebar */}
-        <aside className="w-60 shrink-0 overflow-hidden border-r border-slate-800">
+        <aside className="w-60 shrink-0 overflow-hidden border-r border-steel">
           <SchemaExplorer />
         </aside>
 
@@ -189,7 +196,7 @@ export default function Workspace() {
         <main className="flex flex-1 flex-col overflow-hidden">
 
           {/* Editor + toolbar */}
-          <div className="shrink-0 border-b border-slate-800 p-4">
+          <div className="shrink-0 border-b border-steel p-4">
             <SqlEditor
               value={sql}
               onChange={setSql}
@@ -204,7 +211,7 @@ export default function Workspace() {
               <button
                 onClick={handleExplain}
                 disabled={isExplaining}
-                className="flex items-center gap-1.5 rounded bg-violet-700 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-violet-600 active:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded bg-signal px-4 py-1.5 text-sm font-medium text-void transition-opacity hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {isExplaining ? (
                   <>
@@ -219,7 +226,7 @@ export default function Workspace() {
           </div>
 
           {/* Tab bar */}
-          <div className="flex shrink-0 gap-0 border-b border-slate-800 bg-slate-900 px-4">
+          <div className="flex shrink-0 gap-0 border-b border-steel bg-ink px-4">
             {(['results', 'plan'] as const).map((tab) => {
               const labels: Record<ActiveTab, string> = {
                 results: 'Results',
@@ -233,7 +240,7 @@ export default function Workspace() {
                   className={`
                     px-4 py-2.5 text-sm font-medium transition-colors border-b-2
                     ${active
-                      ? 'border-indigo-500 text-indigo-400'
+                      ? 'border-signal text-signal'
                       : 'border-transparent text-slate-500 hover:text-slate-300'
                     }
                   `}

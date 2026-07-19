@@ -101,12 +101,12 @@ export default function SqlEditor({
             onKeyDown={handleAiInputKeyDown}
             disabled={isAskingAi}
             placeholder="Ask in plain English, e.g. 'show top 10 customers by revenue'"
-            className="flex-1 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded border border-steel bg-ink px-3 py-1.5 text-sm text-slate-200 placeholder-fog/60 outline-none transition-colors focus:border-signal disabled:cursor-not-allowed disabled:opacity-50"
           />
           <button
             onClick={handleAskAi}
             disabled={isAskingAi || aiPrompt.trim().length === 0}
-            className="flex items-center gap-1.5 rounded bg-slate-700 px-3 py-1.5 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-600 active:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded bg-steel px-3 py-1.5 text-sm font-medium text-slate-200 transition-opacity hover:opacity-70 active:opacity-50 disabled:cursor-not-allowed disabled:opacity-40"
             title="Generate SQL from plain English"
           >
             {isAskingAi ? (
@@ -122,12 +122,12 @@ export default function SqlEditor({
 
         {/* Inline AI error */}
         {aiError && (
-          <p className="text-xs text-red-400">{aiError}</p>
+          <p className="text-xs text-alert">{aiError}</p>
         )}
       </div>
 
       {/* ── Monaco editor ── */}
-      <div className="overflow-hidden rounded border border-slate-700">
+      <div className="overflow-hidden rounded border border-steel">
         <Editor
           height="200px"
           language="sql"
@@ -153,11 +153,11 @@ export default function SqlEditor({
         <button
           onClick={onRun}
           disabled={isRunning}
-          className="flex items-center gap-1.5 rounded bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded bg-pulse px-4 py-1.5 text-sm font-medium text-void transition-opacity hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isRunning ? (
             <>
-              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-void border-t-transparent" />
               Running…
             </>
           ) : (
@@ -165,7 +165,7 @@ export default function SqlEditor({
           )}
         </button>
 
-        <span className="text-xs text-slate-600">
+        <span className="text-xs text-fog/60">
           Ctrl+Enter to run
         </span>
       </div>

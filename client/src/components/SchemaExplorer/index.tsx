@@ -32,7 +32,7 @@ interface TableDetails {
 
 function LoadingDots() {
   return (
-    <div className="flex items-center gap-1 px-3 py-2 text-slate-400 text-sm">
+    <div className="flex items-center gap-1 px-3 py-2 text-fog text-sm">
       <span className="animate-pulse">●</span>
       <span className="animate-pulse [animation-delay:150ms]">●</span>
       <span className="animate-pulse [animation-delay:300ms]">●</span>
@@ -42,18 +42,18 @@ function LoadingDots() {
 
 function InlineError({ message }: { message: string }) {
   return (
-    <div className="mx-2 my-1 rounded border border-red-800 bg-red-950 px-3 py-2 text-xs text-red-300">
+    <div className="mx-2 my-1 rounded border border-alert/40 bg-alert/10 px-3 py-2 text-xs text-alert">
       {message}
     </div>
   );
 }
 
-// Column badge for PK / FK
+// Column badge for PK / FK — visually distinct from each other
 function Badge({ label, title }: { label: string; title?: string }) {
   const colours =
     label === 'PK'
-      ? 'bg-amber-700 text-amber-100'
-      : 'bg-sky-800 text-sky-100';
+      ? 'bg-signal text-void'              // amber-fill, dark text — primary key
+      : 'bg-pulse/20 text-pulse';          // teal tint — foreign key
   return (
     <span
       title={title}
@@ -67,16 +67,16 @@ function Badge({ label, title }: { label: string; title?: string }) {
 // Expanded table panel — columns + indexes
 function TablePanel({ details }: { details: TableDetails }) {
   return (
-    <div className="border-t border-slate-700 bg-slate-900 px-3 py-2">
+    <div className="border-t border-steel bg-ink px-3 py-2">
       {/* Columns */}
-      <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+      <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-fog">
         Columns
       </p>
       <ul className="mb-3 space-y-0.5">
         {details.columns.map((col) => (
           <li key={col.name} className="flex items-center text-xs">
-            <span className="font-mono text-slate-200">{col.name}</span>
-            <span className="ml-2 text-slate-500">{col.type}</span>
+            <span className="font-mono text-slate-100">{col.name}</span>
+            <span className="ml-2 text-fog">{col.type}</span>
             {col.isPrimaryKey && <Badge label="PK" title="Primary key" />}
             {col.isForeignKey && (
               <Badge
@@ -91,19 +91,19 @@ function TablePanel({ details }: { details: TableDetails }) {
       {/* Indexes */}
       {details.indexes.length > 0 && (
         <>
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-fog">
             Indexes
           </p>
           <ul className="space-y-0.5">
             {details.indexes.map((idx) => (
               <li key={idx.name} className="text-xs">
-                <span className="font-mono text-slate-300">{idx.name}</span>
+                <span className="font-mono text-slate-200">{idx.name}</span>
                 {idx.isUnique && (
-                  <span className="ml-1 text-[10px] text-emerald-400">
+                  <span className="ml-1 text-[10px] text-pulse">
                     UNIQUE
                   </span>
                 )}
-                <span className="ml-1 text-slate-500">
+                <span className="ml-1 text-fog">
                   ({idx.columns.join(', ')})
                 </span>
               </li>
@@ -113,7 +113,7 @@ function TablePanel({ details }: { details: TableDetails }) {
       )}
 
       {details.indexes.length === 0 && (
-        <p className="text-xs text-slate-600 italic">No indexes</p>
+        <p className="text-xs text-fog/50 italic">No indexes</p>
       )}
     </div>
   );
@@ -159,14 +159,14 @@ function TableRow({ name }: { name: string }) {
   }
 
   return (
-    <li className="border-b border-slate-800 last:border-0">
+    <li className="border-b border-steel last:border-0">
       <button
         onClick={toggleExpand}
-        className="flex w-full items-center gap-1.5 px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-700 active:bg-slate-600 transition-colors"
+        className="flex w-full items-center gap-1.5 px-3 py-2 text-left text-sm text-slate-200 hover:bg-steel active:bg-steel/70 transition-colors"
       >
         {/* Chevron */}
         <span
-          className={`text-slate-500 transition-transform duration-150 ${
+          className={`text-fog transition-transform duration-150 ${
             expanded ? 'rotate-90' : ''
           }`}
         >
@@ -231,12 +231,12 @@ export default function SchemaExplorer() {
   return (
     <div className="flex h-full flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-700 px-3 py-2">
-        <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+      <div className="flex items-center justify-between border-b border-steel px-3 py-2">
+        <span className="text-xs font-semibold uppercase tracking-widest text-fog">
           Schema
         </span>
         {loading && (
-          <span className="text-[10px] text-slate-600 animate-pulse">
+          <span className="text-[10px] text-fog/50 animate-pulse">
             loading…
           </span>
         )}
@@ -249,7 +249,7 @@ export default function SchemaExplorer() {
         )}
 
         {!loading && !error && tables.length === 0 && (
-          <p className="px-3 py-4 text-xs text-slate-600 italic">
+          <p className="px-3 py-4 text-xs text-fog/50 italic">
             No tables found in public schema.
           </p>
         )}
