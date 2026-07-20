@@ -224,7 +224,13 @@ export default function PlanViewer({
       )}
 
       {/* ── Plan tree ── */}
-      {rawPlan && (rawPlan as Record<string, unknown>)['Plan'] && (
+      {/* Root cause of the former tsc error: indexing Record<string, unknown>
+          yields `unknown`, which TypeScript propagates as the type of the whole
+          `&&` chain — making it un-assignable to ReactNode and flagging the
+          _first_ JSX child expression (the explanation ternary) as the error
+          site. Fix: cast the middle operand to boolean with `!!` so the chain
+          evaluates to `false | JSX.Element`, which IS a valid ReactNode. */}
+      {rawPlan && !!(rawPlan as Record<string, unknown>)['Plan'] && (
         <div className="flex flex-col gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-fog">
             Execution Plan Tree
@@ -232,6 +238,7 @@ export default function PlanViewer({
           <PlanTree plan={(rawPlan as Record<string, unknown>)['Plan'] as object} />
         </div>
       )}
+
 
       {/* ── Issues ── */}
       {hasIssues && (
