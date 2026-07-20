@@ -59,9 +59,10 @@ Developers write slow SQL and don't know why. Reading raw `EXPLAIN ANALYZE` JSON
   - Connection fully driven by `DATABASE_URL` environment variable — switching environments requires only a `.env` change, never a code change
 
 ## Deployment
-- Frontend → Vercel
-- Backend → Railway
-- Database → Neon (production), local Postgres (development)
+- Frontend → Vercel: **https://querylens-nu.vercel.app**
+- Backend → Railway: **https://querylens-production-515e.up.railway.app**
+- Database → Neon (production, project `querylens-ai`), local Postgres (development)
+- CORS on the backend restricts allowed origins to `localhost` (dev) and the Vercel production URL (`FRONTEND_ORIGIN` env var) — no wildcard origins in production
 
 ## Success Criteria (what "done" means)
 - User can write/run a SELECT query and see results in under 10 seconds
